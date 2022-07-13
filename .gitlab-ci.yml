@@ -1,0 +1,37 @@
+image: ubuntu
+
+stages:
+   - build jar
+   - build and push docker image
+cache:
+  paths:
+    - .m2/repository
+    - target
+ 
+
+build:
+
+  image: maven:3.6.3-jdk-11-slim
+
+  stage: build jar
+  script:
+     - mvn clean package
+
+  artifacts:
+
+    paths:
+
+      - target/*.jar
+
+docker build:
+  image: docker:stable
+  stage: build and push docker image
+
+  before_script:
+  - docker info
+
+  script:
+
+    - docker build -t gitlab-cicd . 
+    # - docker tag gitlab-cicd:latest 013864166311.dkr.ecr.us-east-1.amazonaws.com/gitlab-cicd:latest
+    # - docker push 013864166311.dkr.ecr.us-east-1.amazonaws.com/gitlab-cicd:latest
